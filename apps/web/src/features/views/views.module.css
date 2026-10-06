@@ -1,0 +1,268 @@
+.toolbarShell {
+  border-bottom: 1px solid var(--tabula-color-border);
+  background: var(--tabula-color-bg-elevated);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tabula-space-3);
+  padding: 8px 12px;
+}
+
+.viewTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.viewTitleIcon {
+  color: #2563eb;
+}
+
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill,
+.iconPill {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--tabula-color-text);
+  cursor: pointer;
+}
+
+.pill:hover,
+.iconPill:hover {
+  background: #f1f5f9;
+}
+
+.pillActive {
+  background: #e2e8f0;
+}
+
+.pillActiveBlue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.pillActiveGreen {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.iconPill {
+  font-size: 1rem;
+  padding: 4px 8px;
+}
+
+.panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px 14px;
+  border-top: 1px solid #eef2f6;
+  background: #fafbfc;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 160px;
+  font-size: 0.875rem;
+}
+
+.panelAction {
+  border: 1px solid var(--tabula-color-border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.searchInput {
+  width: min(420px, 100%);
+  padding: 8px 10px;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.panel select {
+  font: inherit;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--tabula-color-border);
+  background: #fff;
+}
+
+.viewTabs {
+  display: flex;
+  gap: var(--tabula-space-1);
+}
+
+.viewTab {
+  padding: var(--tabula-space-2) var(--tabula-space-3);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--tabula-font-size-sm);
+}
+
+.viewTabActive {
+  border-color: var(--tabula-color-accent);
+  background: var(--tabula-color-accent-subtle);
+  color: var(--tabula-color-accent-hover);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tabula-space-2);
+  align-items: center;
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--tabula-space-1);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterRow select,
+.filterRow input {
+  font: inherit;
+  padding: var(--tabula-space-1) var(--tabula-space-2);
+  border-radius: var(--tabula-radius-sm);
+  border: 1px solid var(--tabula-color-border);
+}
+
+.removeCondition {
+  border: 1px solid var(--tabula-color-border);
+  background: #fff;
+  color: var(--tabula-color-text-muted);
+  border-radius: var(--tabula-radius-sm);
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+}
+
+.removeCondition:hover {
+  background: #fef2f2;
+  color: var(--tabula-color-danger);
+  border-color: #fecaca;
+}
+
+.sortLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--tabula-space-2);
+  font-size: var(--tabula-font-size-sm);
+  color: var(--tabula-color-text-muted);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--tabula-space-4);
+  padding: var(--tabula-space-4);
+}
+
+.card {
+  background: var(--tabula-color-bg-elevated);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-md);
+  padding: var(--tabula-space-4);
+  box-shadow: var(--tabula-shadow-sm);
+}
+
+.cardTitle {
+  font-weight: 600;
+  margin-bottom: var(--tabula-space-2);
+}
+
+.kanban {
+  display: flex;
+  gap: var(--tabula-space-3);
+  padding: var(--tabula-space-4);
+  overflow-x: auto;
+  min-height: 280px;
+}
+
+.kanbanCol {
+  min-width: 220px;
+  background: var(--tabula-color-bg);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-md);
+  padding: var(--tabula-space-3);
+}
+
+.kanbanColTitle {
+  font-weight: 600;
+  margin-bottom: var(--tabula-space-3);
+  font-size: var(--tabula-font-size-sm);
+}
+
+.kanbanCard {
+  background: var(--tabula-color-bg-elevated);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-sm);
+  padding: var(--tabula-space-2) var(--tabula-space-3);
+  margin-bottom: var(--tabula-space-2);
+  font-size: var(--tabula-font-size-sm);
+}
+
+.calendar {
+  padding: var(--tabula-space-4);
+}
+
+.calendarDay {
+  margin-bottom: var(--tabula-space-4);
+}
+
+.calendarDayTitle {
+  font-weight: 600;
+  color: var(--tabula-color-accent);
+  margin-bottom: var(--tabula-space-2);
+}
+
+.formView {
+  max-width: 480px;
+  padding: var(--tabula-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tabula-space-4);
+}
+
+.formField label {
+  display: block;
+  font-size: var(--tabula-font-size-sm);
+  font-weight: 500;
+  margin-bottom: var(--tabula-space-1);
+}
+
+.formField input,
+.formField textarea {
+  width: 100%;
+  font: inherit;
+  padding: var(--tabula-space-2) var(--tabula-space-3);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-sm);
+}

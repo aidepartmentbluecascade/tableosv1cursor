@@ -1,0 +1,65 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tabula-space-2);
+  padding: var(--tabula-space-2) var(--tabula-space-4);
+  font-family: var(--tabula-font-sans);
+  font-size: var(--tabula-font-size-md);
+  font-weight: 600;
+  color: var(--tabula-color-text-inverse);
+  background: var(--tabula-color-accent);
+  border: 1px solid transparent;
+  border-radius: var(--tabula-radius-md);
+  box-shadow: var(--tabula-shadow-sm);
+  cursor: pointer;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--tabula-color-accent-hover);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--tabula-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  composes: button;
+  color: var(--tabula-color-text);
+  background: var(--tabula-color-bg-elevated);
+  border-color: var(--tabula-color-border);
+}
+
+.input {
+  width: 100%;
+  padding: var(--tabula-space-2) var(--tabula-space-3);
+  font-family: var(--tabula-font-sans);
+  font-size: var(--tabula-font-size-md);
+  color: var(--tabula-color-text);
+  background: var(--tabula-color-bg-elevated);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-md);
+  box-shadow: var(--tabula-shadow-sm);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--tabula-color-accent);
+  box-shadow: 0 0 0 3px var(--tabula-color-focus-ring);
+}
+
+.label {
+  display: block;
+  margin-bottom: var(--tabula-space-1);
+  font-family: var(--tabula-font-sans);
+  font-size: var(--tabula-font-size-sm);
+  font-weight: 600;
+  color: var(--tabula-color-text-muted);
+}

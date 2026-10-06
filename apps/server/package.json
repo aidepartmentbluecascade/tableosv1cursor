@@ -1,0 +1,59 @@
+{
+  "name": "@tabula/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "tabula": {
+    "tier": "T3",
+    "env": "node"
+  },
+  "scripts": {
+    "dev": "tsx watch src/entrypoints/api.ts",
+    "dev:realtime": "tsx watch src/entrypoints/realtime.ts",
+    "dev:worker": "tsx watch src/entrypoints/worker.ts",
+    "dev:relay": "tsx watch src/entrypoints/relay.ts",
+    "build": "tsup src/entrypoints/api.ts --format esm --no-dts",
+    "start": "node dist/api.js",
+    "typecheck": "tsc -b --pretty false",
+    "lint": "node -e \"process.exit(0)\"",
+    "test": "tsx --test src/http/openapi.test.ts"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^10.0.2",
+    "@tabula/auth": "workspace:*",
+    "@tabula/compute": "workspace:*",
+    "@tabula/config": "workspace:*",
+    "@tabula/fields": "workspace:*",
+    "@tabula/formula": "workspace:*",
+    "@tabula/links": "workspace:*",
+    "@tabula/db": "workspace:*",
+    "@tabula/events": "workspace:*",
+    "@tabula/jobs": "workspace:*",
+    "@tabula/filter": "workspace:*",
+    "@tabula/query": "workspace:*",
+    "@tabula/realtime-protocol": "workspace:*",
+    "@tabula/observability": "workspace:*",
+    "@tabula/permissions": "workspace:*",
+    "@tabula/search": "workspace:*",
+    "@tabula/storage": "workspace:*",
+    "@tabula/types": "workspace:*",
+    "bullmq": "^5.34.8",
+    "fastify": "^5.2.1",
+    "ioredis": "^5.4.2",
+    "otpauth": "^9.3.6",
+    "kysely": "^0.27.5",
+    "pg": "^8.13.1",
+    "pino": "^9.6.0",
+    "ws": "^8.18.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@tabula/tsconfig": "workspace:*",
+    "@types/node": "^22.10.2",
+    "@types/ws": "^8.5.13",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

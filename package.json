@@ -1,0 +1,30 @@
+{
+  "name": "tabula",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel --filter=@tabula/server --filter=@tabula/web --filter=@tabula/public",
+    "dogfood": "node scripts/dogfood.mjs",
+    "dev:api": "pnpm --filter @tabula/server dev",
+    "dev:realtime": "pnpm --filter @tabula/server dev:realtime",
+    "dev:worker": "pnpm --filter @tabula/server dev:worker",
+    "dev:relay": "pnpm --filter @tabula/server dev:relay",
+    "dev:web": "pnpm --filter @tabula/web dev",
+    "dev:public": "pnpm --filter @tabula/public dev",
+    "db:migrate": "pnpm --filter @tabula/db migrate",
+    "db:seed": "pnpm --filter @tabula/db seed",
+    "test:e2e": "pnpm --filter @tabula/web test:e2e",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22"
+  }
+}

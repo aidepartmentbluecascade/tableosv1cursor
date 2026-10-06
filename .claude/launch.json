@@ -1,0 +1,59 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cc-api",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["pnpm@9.15.0", "--filter", "@tabula/server", "dev"],
+      "port": 3100,
+      "url": "http://localhost:3100",
+      "env": {
+        "PORT": "3100",
+        "REALTIME_PORT": "3102",
+        "DATABASE_URL": "postgres://tabula:tabula@localhost:5432/tabula_cc",
+        "REDIS_URL": "redis://localhost:6379/1",
+        "APP_URL": "http://localhost:5183",
+        "API_URL": "http://localhost:3100"
+      }
+    },
+    {
+      "name": "cc-realtime",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["pnpm@9.15.0", "--filter", "@tabula/server", "dev:realtime"],
+      "port": 3102,
+      "url": "http://localhost:3102",
+      "env": {
+        "PORT": "3100",
+        "REALTIME_PORT": "3102",
+        "DATABASE_URL": "postgres://tabula:tabula@localhost:5432/tabula_cc",
+        "REDIS_URL": "redis://localhost:6379/1",
+        "APP_URL": "http://localhost:5183",
+        "API_URL": "http://localhost:3100"
+      }
+    },
+    {
+      "name": "cc-web",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["pnpm@9.15.0", "--filter", "@tabula/web", "dev"],
+      "port": 5183,
+      "url": "http://localhost:5183",
+      "env": {
+        "TABULA_WEB_PORT": "5183",
+        "TABULA_API_PROXY": "http://localhost:3100",
+        "TABULA_REALTIME_PROXY": "ws://localhost:3102",
+        "VITE_PUBLIC_APP_URL": "http://localhost:5184"
+      }
+    },
+    {
+      "name": "cc-public",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["pnpm@9.15.0", "--filter", "@tabula/public", "dev"],
+      "port": 5184,
+      "url": "http://localhost:5184",
+      "env": {
+        "TABULA_PUBLIC_PORT": "5184",
+        "TABULA_API_PROXY": "http://localhost:3100"
+      }
+    }
+  ]
+}

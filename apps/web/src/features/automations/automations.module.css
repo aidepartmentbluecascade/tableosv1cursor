@@ -1,0 +1,272 @@
+.shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.subHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--tabula-color-border);
+}
+
+.crumb {
+  color: var(--tabula-color-text-muted);
+  font-weight: 600;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.selectedName {
+  font-size: 0.95rem;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.sidebar {
+  width: 280px;
+  border-right: 1px solid var(--tabula-color-border);
+  padding: 12px;
+  background: #f7f8fa;
+  overflow: auto;
+}
+
+.createWrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.createBtn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.createMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 10px;
+  box-shadow: var(--tabula-shadow-md);
+  padding: 6px;
+}
+
+.createMenu button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.createMenu button:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.createMenu button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.remaining {
+  color: var(--tabula-color-text-muted);
+  font-size: 0.75rem;
+}
+
+.find {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.listItem {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.listItemActive,
+.listItem:hover {
+  background: #e8edf3;
+}
+
+.listIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #16a34a;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.listMeta {
+  display: block;
+  margin-top: 4px;
+  color: var(--tabula-color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.badgeOn,
+.badgeOff {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.badgeOn {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badgeOff {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.canvas {
+  flex: 1;
+  padding: 32px;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 1px 1px, #e2e8f0 1px, transparent 0) 0 0 / 18px 18px;
+}
+
+.triggerCol {
+  max-width: 420px;
+}
+
+.triggerLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--tabula-color-text-muted);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.addTrigger {
+  width: 100%;
+  padding: 18px;
+  border: 1.5px dashed #94a3b8;
+  border-radius: 10px;
+  background: #fff;
+  color: #2563eb;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.suggestedTitle {
+  margin: 20px 0 8px;
+  font-weight: 700;
+}
+
+.suggested {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggested button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  padding: 10px 4px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  border-radius: 6px;
+}
+
+.suggested button:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.triggerCard {
+  background: #fff;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--tabula-shadow-sm);
+}
+
+.triggerHint {
+  color: var(--tabula-color-text-muted);
+  font-size: 0.875rem;
+}
+
+.panelAction {
+  margin-top: 12px;
+  border: 1px solid var(--tabula-color-border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.seeAll {
+  margin-top: 16px;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}

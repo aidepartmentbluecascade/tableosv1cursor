@@ -1,0 +1,69 @@
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: var(--tabula-color-text);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.trigger:hover {
+  background: #eef2f6;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 40;
+  width: 320px;
+  background: #fff;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 12px;
+  box-shadow: var(--tabula-shadow-md);
+  padding: 6px;
+}
+
+.item {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.item:hover {
+  background: #f1f5f9;
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #334155;
+  flex-shrink: 0;
+}
+
+.detail {
+  display: block;
+  margin-top: 2px;
+  color: var(--tabula-color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}

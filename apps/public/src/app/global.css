@@ -1,0 +1,19 @@
+@import "@tabula/ui/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--tabula-font-sans);
+  color: var(--tabula-color-text);
+  background: var(--tabula-color-bg-subtle);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}

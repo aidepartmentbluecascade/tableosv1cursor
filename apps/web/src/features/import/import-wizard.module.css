@@ -1,0 +1,45 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--tabula-space-4);
+}
+
+.panel {
+  width: min(560px, 100%);
+  background: var(--tabula-color-bg-elevated);
+  border-radius: var(--tabula-radius-lg);
+  padding: var(--tabula-space-5);
+  box-shadow: var(--tabula-shadow-md);
+}
+
+.hint {
+  color: var(--tabula-color-text-muted);
+  font-size: var(--tabula-font-size-sm);
+}
+
+.textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--tabula-font-size-sm);
+  border: 1px solid var(--tabula-color-border);
+  border-radius: var(--tabula-radius-md);
+  padding: var(--tabula-space-3);
+  margin: var(--tabula-space-3) 0;
+  box-sizing: border-box;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tabula-space-2);
+  margin-top: var(--tabula-space-4);
+}
+
+.success {
+  color: var(--tabula-color-success);
+  font-size: var(--tabula-font-size-sm);
+}
