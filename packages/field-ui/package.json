@@ -1,0 +1,35 @@
+{
+  "name": "@tabula/field-ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "tabula": {
+    "tier": "T2b",
+    "env": "browser"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "node -e \"process.exit(0)\"",
+    "test": "node -e \"process.exit(0)\""
+  },
+  "dependencies": {
+    "@tabula/fields": "workspace:*",
+    "@tabula/formula": "workspace:*"
+  },
+  "devDependencies": {
+    "@tabula/tsconfig": "workspace:*",
+    "@types/react": "^19.0.2",
+    "react": "^19.0.0",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

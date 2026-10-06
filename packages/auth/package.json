@@ -1,0 +1,31 @@
+{
+  "name": "@tabula/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "tabula": {
+    "tier": "T2a",
+    "env": "node"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "node -e \"process.exit(0)\"",
+    "test": "node -e \"process.exit(0)\""
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
+    "otpauth": "^9.3.6"
+  },
+  "devDependencies": {
+    "@tabula/tsconfig": "workspace:*",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

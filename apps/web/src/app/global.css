@@ -1,0 +1,54 @@
+@import "@tabula/ui/tokens.css";
+
+:root {
+  --tabula-font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --tabula-font-display: "Fraunces", Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--tabula-font-sans);
+  font-size: var(--tabula-font-size-md);
+  color: var(--tabula-color-text);
+  background: var(--tabula-color-bg-subtle);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--tabula-color-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  color: var(--tabula-color-accent-hover);
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--tabula-font-display);
+  font-weight: 600;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
