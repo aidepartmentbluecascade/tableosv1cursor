@@ -37,7 +37,8 @@ async function parseProblem(response: Response): Promise<TabulaError> {
   return problem;
 }
 
-async function request<T>(
+/** Shared fetch wrapper. Area modules in `lib/api/*.ts` reuse this. */
+export async function request<T>(
   path: string,
   init?: RequestInit & { json?: unknown; clientOpId?: string },
 ): Promise<T> {
