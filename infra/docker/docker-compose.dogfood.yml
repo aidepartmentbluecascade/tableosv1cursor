@@ -1,0 +1,6 @@
+# Optional overlay for dogfood (isolated Compose project name).
+# Usage:
+#   docker compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.dogfood.yml up -d --wait
+# App processes: `pnpm dogfood` (scripts/dogfood.mjs) — not run in containers.
+
+name: tabula-dogfood

@@ -1,0 +1,14 @@
+node_modules
+dist
+.turbo
+.env
+.env.*
+!.env.example
+secrets/
+!secrets/.gitkeep
+coverage
+*.log
+.DS_Store
+*.pem
+*-credentials.json
+**/gcs-service-account.json

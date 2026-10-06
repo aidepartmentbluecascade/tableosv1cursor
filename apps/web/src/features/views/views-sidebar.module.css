@@ -1,0 +1,196 @@
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  border-right: 1px solid var(--tabula-color-border);
+  background: #f7f8fa;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 12px 10px 24px;
+}
+
+.createWrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.createBtn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.createBtn:hover {
+  background: #eef2f6;
+}
+
+.createMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 10px;
+  box-shadow: var(--tabula-shadow-md);
+  padding: 6px;
+}
+
+.createItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.createItem:hover {
+  background: #f1f5f9;
+}
+
+.createIcon {
+  width: 1.25rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--tabula-color-border);
+  margin: 4px 0;
+}
+
+.findRow {
+  margin-bottom: 12px;
+}
+
+.findInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 6px;
+  font: inherit;
+  background: #fff;
+}
+
+.section {
+  margin-bottom: 8px;
+}
+
+.sectionHead {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 6px 6px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--tabula-color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.star {
+  color: #eab308;
+}
+
+.viewItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+}
+
+.viewItem:hover {
+  background: #eceff3;
+}
+
+.viewItemActive {
+  background: #e2e8f0;
+}
+
+.viewBtn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 7px 6px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.viewIcon {
+  color: #2563eb;
+  font-size: 0.9rem;
+}
+
+.viewName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.moreBtn {
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: var(--tabula-color-text-muted);
+  opacity: 0;
+}
+
+.viewItem:hover .moreBtn,
+.viewItemActive .moreBtn {
+  opacity: 1;
+}
+
+.menu {
+  position: absolute;
+  z-index: 30;
+  top: 100%;
+  right: 4px;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 8px;
+  box-shadow: var(--tabula-shadow-md);
+  padding: 4px;
+}
+
+.menu button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.menu button:hover {
+  background: #f1f5f9;
+}

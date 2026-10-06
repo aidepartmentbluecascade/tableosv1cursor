@@ -1,0 +1,83 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  width: min(420px, 100%);
+  height: 100%;
+  background: var(--tabula-color-bg-elevated);
+  box-shadow: var(--tabula-shadow-md);
+  padding: var(--tabula-space-5);
+  overflow: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tabula-space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--tabula-font-size-lg);
+}
+
+.close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--tabula-color-text-muted);
+}
+
+.recordId {
+  font-size: var(--tabula-font-size-sm);
+  color: var(--tabula-color-text-muted);
+  word-break: break-all;
+}
+
+.section {
+  margin-top: var(--tabula-space-5);
+}
+
+.section h3 {
+  margin: 0 0 var(--tabula-space-3);
+  font-size: var(--tabula-font-size-md);
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 var(--tabula-space-3);
+  padding: 0;
+}
+
+.comment {
+  padding: var(--tabula-space-2) 0;
+  border-bottom: 1px solid var(--tabula-color-border);
+}
+
+.comment p {
+  margin: var(--tabula-space-1) 0 0;
+}
+
+.muted {
+  color: var(--tabula-color-text-muted);
+  font-size: var(--tabula-font-size-sm);
+}
+
+.commentForm {
+  display: flex;
+  gap: var(--tabula-space-2);
+  align-items: flex-end;
+}
+
+.hiddenFile {
+  display: none;
+}

@@ -1,0 +1,82 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.panel {
+  background: var(--tabula-color-bg-elevated);
+  border-radius: var(--tabula-radius-lg);
+  padding: 20px;
+  width: min(420px, 100%);
+  max-height: min(80vh, 720px);
+  overflow: auto;
+  box-shadow: var(--tabula-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list {
+  border: 1px solid var(--tabula-color-border);
+  border-radius: 10px;
+  max-height: 360px;
+  overflow: auto;
+  padding: 6px;
+}
+
+.group {
+  margin: 8px 6px 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--tabula-color-text-muted);
+}
+
+.typeBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.typeBtn:hover {
+  background: #f1f5f9;
+}
+
+.typeBtnActive {
+  background: #e8eefc;
+}
+
+.icon {
+  width: 22px;
+  text-align: center;
+}
+
+.empty {
+  padding: 16px;
+  color: var(--tabula-color-text-muted);
+}
+
+.selected {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--tabula-color-text-muted);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
