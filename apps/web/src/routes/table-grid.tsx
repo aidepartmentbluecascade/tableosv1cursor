@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { DomGrid } from "../features/grid/DomGrid.tsx";
 import { CalendarView } from "../features/views/CalendarView.tsx";
@@ -9,11 +9,28 @@ import {
   ViewToolbar,
   buildFilterAst,
 } from "../features/views/ViewToolbar.tsx";
+import { useViewConfig, useViewRecords } from "../features/views/view-hooks.ts";
 import type { ViewKind } from "../features/views/view-types.ts";
+import { toRootGroup } from "../features/views/view-utils.ts";
 import { RecordExpandDrawer } from "../features/record/RecordExpandDrawer.tsx";
 import { AddFieldDialog } from "../features/schema/AddFieldDialog.tsx";
-import { api, type TableDto, type ViewDto } from "../lib/api.ts";
+import { api, type FilterAst, type TableDto, type ViewDto } from "../lib/api.ts";
+import type { ViewConfig } from "../lib/api-areas/views.ts";
 import styles from "../features/grid/grid.module.css";
+
+function conditionsFromFilter(filter: FilterAst | null) {
+  const conds = toRootGroup(filter).children.filter(
+    (c): c is Extract<FilterAst, { kind: "condition" }> => c.kind === "condition",
+  );
+  if (conds.length === 0) {
+    return [{ fieldId: "", op: "contains", value: "" }];
+  }
+  return conds.map((c) => ({
+    fieldId: c.fieldId,
+    op: c.op,
+    value: typeof c.value === "string" ? c.value : c.value == null ? "" : String(c.value),
+  }));
+}
 
 export function TableGridPage({
   baseId,
@@ -38,17 +55,7 @@ export function TableGridPage({
     [table.fields],
   );
   const viewKind = (activeView?.type as ViewKind | undefined) ?? "grid";
-  const [filterConditions, setFilterConditions] = useState([
-    { fieldId: "", op: "contains", value: "" },
-  ]);
-  const [sortFieldId, setSortFieldId] = useState("");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [groupFieldId, setGroupFieldId] = useState("");
-  const [colorFieldId, setColorFieldId] = useState("");
-  const [rowHeight, setRowHeight] = useState<
-    "short" | "medium" | "tall" | "extra"
-  >("short");
-  const [hiddenFieldIds, setHiddenFieldIds] = useState<string[]>([]);
+  const { config, update } = useViewConfig(baseId, table.id, activeView);
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerRecordId, setDrawerRecordId] = useState<string | null>(null);
   const [addFieldOpen, setAddFieldOpen] = useState(false);
@@ -61,6 +68,7 @@ export function TableGridPage({
     void onOpenImport;
   }, [onOpenImport]);
 
+  const hiddenFieldIds = config.hiddenFieldIds;
   const visibleFields = useMemo(
     () => fields.filter((f) => !hiddenFieldIds.includes(f.id)),
     [fields, hiddenFieldIds],
@@ -70,46 +78,30 @@ export function TableGridPage({
     [table, visibleFields],
   );
 
-  const filter = buildFilterAst(filterConditions);
+  const filter = config.filter ?? undefined;
   const sort =
-    sortFieldId.length > 0
-      ? [{ field: sortFieldId, direction: sortDirection }]
+    config.sorts.length > 0
+      ? config.sorts
+          .filter((s) => s.fieldId)
+          .map((s) => ({ field: s.fieldId, direction: s.direction }))
       : undefined;
+  const groupFieldId = config.groups[0]?.fieldId ?? "";
+  const colorFieldId = config.color.mode === "select" ? config.color.fieldId : "";
+  const rowHeight = config.rowHeight;
+  const filterConditions = useMemo(
+    () => conditionsFromFilter(config.filter),
+    [config.filter],
+  );
 
-  const recordsQuery = useQuery({
-    queryKey: [
-      "records",
-      baseId,
-      table.id,
-      filter,
-      sort,
-      viewKind,
-      searchQuery,
-    ],
-    queryFn: () => {
-      const body: Parameters<typeof api.queryRecords>[2] = {
-        pageSize: 200,
-        fields: fields.map((f) => f.id),
-      };
-      if (filter) body.filter = filter;
-      if (sort) body.sort = sort;
-      return api.queryRecords(baseId, table.id, body);
-    },
-    enabled: viewKind !== "grid",
-  });
-
-  const records = useMemo(() => {
-    const raw = recordsQuery.data?.records ?? [];
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return raw;
-    return raw.filter((r) =>
-      Object.values(r.fields).some((v) =>
-        String(v ?? "")
-          .toLowerCase()
-          .includes(q),
-      ),
-    );
-  }, [recordsQuery.data, searchQuery]);
+  const recordsQuery = useViewRecords(
+    baseId,
+    table,
+    activeView?.id,
+    config,
+    searchQuery,
+    { enabled: viewKind !== "grid" },
+  );
+  const records = recordsQuery.records;
 
   const createRecord = useMutation({
     mutationFn: (payload: Record<string, unknown> = {}) => {
@@ -152,21 +144,28 @@ export function TableGridPage({
         viewName={activeView?.name ?? "Grid view"}
         fields={fields}
         hiddenFieldIds={hiddenFieldIds}
-        onHiddenFieldsChange={setHiddenFieldIds}
+        onHiddenFieldsChange={(ids) => update({ hiddenFieldIds: ids })}
         filterConditions={filterConditions}
-        onFilterChange={setFilterConditions}
+        onFilterChange={(conditions) =>
+          update({ filter: (buildFilterAst(conditions) ?? null) as ViewConfig["filter"] })
+        }
         groupFieldId={groupFieldId}
-        onGroupChange={setGroupFieldId}
-        sortFieldId={sortFieldId}
-        sortDirection={sortDirection}
-        onSortChange={(fieldId, direction) => {
-          setSortFieldId(fieldId);
-          setSortDirection(direction);
-        }}
+        onGroupChange={(fieldId) =>
+          update({ groups: fieldId ? [{ fieldId, direction: "asc" }] : [] })
+        }
+        sortFieldId={config.sorts[0]?.fieldId ?? ""}
+        sortDirection={config.sorts[0]?.direction ?? "asc"}
+        onSortChange={(fieldId, direction) =>
+          update({ sorts: fieldId ? [{ fieldId, direction }] : [] })
+        }
         colorFieldId={colorFieldId}
-        onColorChange={setColorFieldId}
+        onColorChange={(fieldId) =>
+          update({
+            color: fieldId ? { mode: "select", fieldId } : { mode: "none" },
+          })
+        }
         rowHeight={rowHeight}
-        onRowHeightChange={setRowHeight}
+        onRowHeightChange={(height) => update({ rowHeight: height })}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onShare={() => onOpenShare?.()}
@@ -204,17 +203,34 @@ export function TableGridPage({
           table={tableForGrid}
           onSchemaChange={onSchemaChange}
           hideChrome
+          filter={filter}
+          sort={sort}
+          search={searchQuery}
         />
       ) : null}
 
       {viewKind === "gallery" ? (
-        <GalleryView table={table} records={records} />
+        <GalleryView
+          table={table}
+          records={records}
+          onOpenRecord={setDrawerRecordId}
+        />
       ) : null}
       {viewKind === "kanban" ? (
-        <KanbanView table={table} records={records} />
+        <KanbanView
+          table={table}
+          records={records}
+          stackFieldId={config.kanban?.stackFieldId ?? null}
+          onOpenRecord={setDrawerRecordId}
+        />
       ) : null}
       {viewKind === "calendar" ? (
-        <CalendarView table={table} records={records} />
+        <CalendarView
+          table={table}
+          records={records}
+          dateFieldId={config.calendar?.dateFieldId ?? null}
+          onOpenRecord={setDrawerRecordId}
+        />
       ) : null}
       {viewKind === "form" ? (
         <FormView

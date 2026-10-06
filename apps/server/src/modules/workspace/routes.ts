@@ -6,6 +6,8 @@ import type { AppContext } from "../../lib/app-context.js";
 import { parsePid, pid } from "../../lib/public-ids.js";
 import { handleRouteError, notFound, validationProblem } from "../../http/errors.js";
 import { userCanAccessWorkspace } from "../access/helpers.js";
+import { assertCan } from "../access/assert.js";
+import { compileForWorkspace } from "../access/compile.js";
 
 const createBody = z.object({
   name: z.string().min(1).max(200),
@@ -98,6 +100,138 @@ export async function registerWorkspaceRoutes(
       handleRouteError(request, reply, err);
     }
   });
+
+  app.patch<{ Params: { workspaceId: string } }>(
+    "/v1/workspaces/:workspaceId",
+    async (request, reply) => {
+      try {
+        const user = request.user;
+        if (!user) {
+          notFound(request, reply);
+          return;
+        }
+        const workspaceId = parsePid(request.params.workspaceId, "wsp");
+        const body = createBody.parse(request.body);
+        const access = await userCanAccessWorkspace(ctx.db, user.id, workspaceId);
+        if (!access.ok) {
+          notFound(request, reply, "Workspace not found");
+          return;
+        }
+        const snapshot = await compileForWorkspace(ctx.db, user.id, workspaceId);
+        assertCan(snapshot, "base.manage_schema");
+        await sql`
+          UPDATE core.workspaces SET name = ${body.name}, updated_at = now()
+          WHERE id = ${workspaceId}
+        `.execute(ctx.db);
+        void reply.send({
+          workspace: { id: pid("wsp", workspaceId), name: body.name },
+        });
+      } catch (err) {
+        handleRouteError(request, reply, err);
+      }
+    },
+  );
+
+  app.delete<{ Params: { workspaceId: string } }>(
+    "/v1/workspaces/:workspaceId",
+    async (request, reply) => {
+      try {
+        const user = request.user;
+        if (!user) {
+          notFound(request, reply);
+          return;
+        }
+        const workspaceId = parsePid(request.params.workspaceId, "wsp");
+        const access = await userCanAccessWorkspace(ctx.db, user.id, workspaceId);
+        if (!access.ok) {
+          notFound(request, reply, "Workspace not found");
+          return;
+        }
+        const snapshot = await compileForWorkspace(ctx.db, user.id, workspaceId);
+        assertCan(snapshot, "base.manage_members");
+        await ctx.db.transaction().execute(async (trx) => {
+          await sql`
+            UPDATE core.workspaces
+            SET status = 'trashed', deleted_at = now(), updated_at = now()
+            WHERE id = ${workspaceId}
+          `.execute(trx);
+          await sql`
+            UPDATE core.base_directory
+            SET status = 'trashed', deleted_at = now(), updated_at = now()
+            WHERE workspace_id = ${workspaceId} AND deleted_at IS NULL
+          `.execute(trx);
+        });
+        void reply.code(204).send();
+      } catch (err) {
+        handleRouteError(request, reply, err);
+      }
+    },
+  );
+
+  app.get<{ Params: { workspaceId: string } }>(
+    "/v1/workspaces/:workspaceId/members",
+    async (request, reply) => {
+      try {
+        const user = request.user;
+        if (!user) {
+          notFound(request, reply);
+          return;
+        }
+        const workspaceId = parsePid(request.params.workspaceId, "wsp");
+        const access = await userCanAccessWorkspace(ctx.db, user.id, workspaceId);
+        if (!access.ok) {
+          notFound(request, reply, "Workspace not found");
+          return;
+        }
+        const rows = await sql<{
+          id: string;
+          email: string;
+          display_name: string;
+          org_role: string;
+          ws_role: string | null;
+        }>`
+          SELECT u.id, u.email, u.display_name, m.role AS org_role,
+                 (SELECT g.role FROM core.access_grants g
+                  WHERE g.principal_type = 'user' AND g.principal_id = u.id
+                    AND g.resource_type = 'workspace' AND g.resource_id = ${workspaceId}
+                  LIMIT 1) AS ws_role
+          FROM core.organization_members m
+          JOIN core.users u ON u.id = m.user_id AND u.status = 'active'
+          WHERE m.org_id = ${access.orgId} AND m.status = 'active'
+          ORDER BY u.display_name ASC, u.email ASC
+        `.execute(ctx.db);
+        let invitations: Array<{ id: string; email: string; role: string; expiresAt: string }> = [];
+        try {
+          const inv = await sql<{ id: string; email: string; role: string; expires_at: Date }>`
+            SELECT id, email, role, expires_at FROM core.invitations
+            WHERE workspace_id = ${workspaceId} AND accepted_at IS NULL
+              AND expires_at > now()
+            ORDER BY expires_at DESC
+            LIMIT 100
+          `.execute(ctx.db);
+          invitations = inv.rows.map((r) => ({
+            id: pid("inv", r.id),
+            email: r.email,
+            role: r.role,
+            expiresAt: new Date(r.expires_at).toISOString(),
+          }));
+        } catch {
+          /* invitations schema may be mid-migration; members still listed */
+        }
+        void reply.send({
+          members: rows.rows.map((r) => ({
+            id: pid("usr", r.id),
+            name: r.display_name || r.email,
+            email: r.email,
+            role: r.ws_role ?? (r.org_role === "owner" || r.org_role === "admin" ? "owner" : r.org_role),
+          })),
+          invitations,
+        });
+      } catch (err) {
+        handleRouteError(request, reply, err);
+      }
+    },
+  );
 
   app.get<{ Params: { workspaceId: string } }>(
     "/v1/workspaces/:workspaceId/bases",

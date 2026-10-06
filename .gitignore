@@ -12,3 +12,4 @@ coverage
 *.pem
 *-credentials.json
 **/gcs-service-account.json
+.data/

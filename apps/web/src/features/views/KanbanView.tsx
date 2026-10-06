@@ -9,16 +9,22 @@ function findKanbanField(fields: FieldDto[]): FieldDto | undefined {
 export function KanbanView({
   table,
   records,
+  stackFieldId,
+  onOpenRecord,
 }: {
   table: TableDto;
   records: RecordDto[];
+  stackFieldId?: string | null;
+  onOpenRecord?: (recordId: string) => void;
 }) {
-  const groupField = findKanbanField(table.fields);
+  const groupField =
+    table.fields.find((f) => f.id === stackFieldId && f.type === "single_select") ??
+    findKanbanField(table.fields);
   const primaryId = table.primaryFieldId;
   const options = groupField?.config.options ?? [];
   const columns =
     options.length > 0
-      ? options.map((o) => o.id)
+      ? [...options.map((o) => o.id), "__ungrouped__"]
       : ["__ungrouped__"];
 
   const labelFor = (optionId: string) => {
@@ -51,7 +57,16 @@ export function KanbanView({
                   )
                 : String(record.fields[primaryId] ?? "Row");
               return (
-                <div key={record.id} className={styles.kanbanCard}>
+                <div
+                  key={record.id}
+                  className={styles.kanbanCard}
+                  role={onOpenRecord ? "button" : undefined}
+                  tabIndex={onOpenRecord ? 0 : undefined}
+                  onClick={() => onOpenRecord?.(record.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") onOpenRecord?.(record.id);
+                  }}
+                >
                   {title || "Untitled"}
                 </div>
               );

@@ -20,7 +20,8 @@
     "test": "node -e \"process.exit(0)\""
   },
   "dependencies": {
-    "@tabula/fields": "workspace:*"
+    "@tabula/fields": "workspace:*",
+    "@tabula/formula": "workspace:*"
   },
   "devDependencies": {
     "@tabula/tsconfig": "workspace:*",

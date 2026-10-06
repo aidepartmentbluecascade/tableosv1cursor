@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@tabula/ui";
 import type { CellValue } from "@tabula/fields";
-import { api, type RecordDto, type TableDto } from "../../lib/api.ts";
+import { api, type FilterAst, type RecordDto, type TableDto } from "../../lib/api.ts";
 import { useUiStore } from "../../stores/ui.ts";
 import { AddFieldDialog } from "../schema/AddFieldDialog.tsx";
 import { FieldHeader } from "../schema/FieldHeader.tsx";
@@ -59,11 +59,17 @@ export function DomGrid({
   table,
   onSchemaChange,
   hideChrome = false,
+  filter,
+  sort,
+  search,
 }: {
   baseId: string;
   table: TableDto;
   onSchemaChange: () => void;
   hideChrome?: boolean;
+  filter?: FilterAst | undefined;
+  sort?: Array<{ field: string; direction: "asc" | "desc" }> | undefined;
+  search?: string;
 }) {
   const queryClient = useQueryClient();
   const fields = [...table.fields].sort((a, b) => a.slot - b.slot);
@@ -71,12 +77,16 @@ export function DomGrid({
   const pendingNav = useRef<{ fieldId: string } | null>(null);
 
   const recordsQuery = useQuery({
-    queryKey: ["records", baseId, table.id],
-    queryFn: () =>
-      api.queryRecords(baseId, table.id, {
+    queryKey: ["records", baseId, table.id, filter, sort, search ?? ""],
+    queryFn: () => {
+      const body: Parameters<typeof api.queryRecords>[2] = {
         pageSize: 200,
         fields: fields.map((f) => f.id),
-      }),
+      };
+      if (filter) body.filter = filter;
+      if (sort && sort.length > 0) body.sort = sort;
+      return api.queryRecords(baseId, table.id, body);
+    },
   });
 
   const [editing, setEditing] = useState<{
@@ -143,7 +153,14 @@ export function DomGrid({
     },
   });
 
-  const records = recordsQuery.data?.records ?? [];
+  const records = (() => {
+    const raw = recordsQuery.data?.records ?? [];
+    const q = search?.trim().toLowerCase();
+    if (!q) return raw;
+    return raw.filter((r) =>
+      Object.values(r.fields).some((v) => JSON.stringify(v ?? "").toLowerCase().includes(q)),
+    );
+  })();
 
   const startEdit = useCallback(
     (record: RecordDto, fieldId: string, fieldType: string) => {

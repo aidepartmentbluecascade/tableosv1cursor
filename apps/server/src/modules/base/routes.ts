@@ -9,9 +9,12 @@ import { handleRouteError, notFound } from "../../http/errors.js";
 import { userCanAccessWorkspace, resolveBaseContext } from "../access/helpers.js";
 import { assertCan } from "../access/assert.js";
 import { compileForWorkspace } from "../access/compile.js";
+import { registerBaseManageRoutes } from "./manage-routes.js";
 import type { MutationActor } from "../../kernel/mutation.js";
-import { withBaseTx } from "../../kernel/mutation.js";
+import { runTransactionWithAfterCommit, withBaseTx } from "../../kernel/mutation.js";
 import { bootstrapDefaultTable } from "./bootstrap-default-table.js";
+import { loadTableConfigInfo, serializeView } from "../views/serialize.js";
+import { compileForUser } from "../access/compile.js";
 
 const nameBody = z.object({
   name: z.string().min(1).max(200),
@@ -30,6 +33,8 @@ export async function registerBaseRoutes(
   app: FastifyInstance,
   ctx: AppContext,
 ): Promise<void> {
+  await registerBaseManageRoutes(app, ctx);
+
   app.post<{ Params: { workspaceId: string } }>(
     "/v1/workspaces/:workspaceId/bases",
     async (request, reply) => {
@@ -54,7 +59,7 @@ export async function registerBaseRoutes(
         const baseId = generateUuidV7();
         const orderKey = nextOrderKey();
 
-        await ctx.db.transaction().execute(async (trx) => {
+        await runTransactionWithAfterCommit(ctx.db, async (trx) => {
           await sql`
             INSERT INTO data.bases (id, workspace_id, name, created_by)
             VALUES (${baseId}, ${workspaceId}, ${body.name}, ${user.id})
@@ -185,9 +190,11 @@ export async function registerBaseRoutes(
           created_by: string | null;
           order_key: string;
           is_favorite: boolean;
+          is_default: boolean;
+          config: unknown;
         }>`
           SELECT v.id, v.table_id, v.name, v.type, v.visibility, v.owner_user_id,
-                 v.created_by, v.order_key,
+                 v.created_by, v.order_key, v.is_default, v.config,
                  (f.view_id IS NOT NULL) AS is_favorite
           FROM data.views v
           LEFT JOIN data.view_favorites f
@@ -209,6 +216,14 @@ export async function registerBaseRoutes(
           fieldsByTable.set(field.table_id, list);
         }
 
+        // Views serialization (workstream D): full config with defaults.
+        const viewConfigInfo = await loadTableConfigInfo(
+          ctx.db,
+          tables.rows.map((t) => t.id),
+        );
+        const viewIsBaseCreator = await compileForUser(ctx.db, user.id, baseId)
+          .then((snap) => snap.effectiveBaseRole === "creator")
+          .catch(() => false);
         const viewsByTable = new Map<string, typeof views.rows>();
         for (const view of views.rows) {
           const list = viewsByTable.get(view.table_id) ?? [];
@@ -233,16 +248,9 @@ export async function registerBaseRoutes(
               slot: f.slot,
               config: (f.config ?? {}) as Record<string, unknown>,
             })),
-            views: (viewsByTable.get(table.id) ?? []).map((v) => ({
-              id: pid("viw", v.id),
-              name: v.name,
-              type: v.type,
-              visibility: v.visibility,
-              ownerUserId: v.owner_user_id ? pid("usr", v.owner_user_id) : null,
-              createdBy: v.created_by ? pid("usr", v.created_by) : null,
-              isFavorite: v.is_favorite,
-              isMine: v.created_by === user.id || v.owner_user_id === user.id,
-            })),
+            views: (viewsByTable.get(table.id) ?? []).map((v) =>
+              serializeView(v, user.id, viewConfigInfo.get(table.id), viewIsBaseCreator),
+            ),
           })),
         });
       } catch (err) {
@@ -268,6 +276,7 @@ export async function registerBaseRoutes(
           notFound(request, reply, "Base not found");
           return;
         }
+        assertCan(await compileForUser(ctx.db, user.id, baseId), "base.manage_schema");
 
         await withBaseTx(
           ctx.db,
@@ -323,6 +332,7 @@ export async function registerBaseRoutes(
           notFound(request, reply, "Base not found");
           return;
         }
+        assertCan(await compileForUser(ctx.db, user.id, baseId), "base.manage_members");
 
         await withBaseTx(
           ctx.db,

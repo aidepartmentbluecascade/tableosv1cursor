@@ -5,9 +5,11 @@ import styles from "./views.module.css";
 export function GalleryView({
   table,
   records,
+  onOpenRecord,
 }: {
   table: TableDto;
   records: RecordDto[];
+  onOpenRecord?: (recordId: string) => void;
 }) {
   const primaryId = table.primaryFieldId;
   const primaryField = table.fields.find((f) => f.id === primaryId);
@@ -20,7 +22,16 @@ export function GalleryView({
           ? formatCellDisplay(primaryField.type, raw, primaryField.config)
           : String(raw ?? "Untitled");
         return (
-          <article key={record.id} className={styles.card}>
+          <article
+            key={record.id}
+            className={styles.card}
+            role={onOpenRecord ? "button" : undefined}
+            tabIndex={onOpenRecord ? 0 : undefined}
+            onClick={() => onOpenRecord?.(record.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") onOpenRecord?.(record.id);
+            }}
+          >
             <div className={styles.cardTitle}>{title || "Untitled"}</div>
             {table.fields
               .filter((f) => f.id !== primaryId)

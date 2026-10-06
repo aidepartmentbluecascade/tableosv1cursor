@@ -230,3 +230,13 @@ Interfaces (Airtable "Interfaces" designer) are **out of scope for this pass**; 
 
 ## Contract changes
 (append dated notes here)
+
+### 2026-10-06 — B: storage formats, helpers (early note; final details in B's report)
+- `keyBetween(a, b)` / `keysBetween(a, b, n)` are exported from `@tabula/types` (built). Generated keys never end in '0'; legacy timestamp keys are tolerated. Throws `RangeError` when `a >= b`.
+- **Cell storage** (`data.records.cells`, keyed by slot) written by B's write path:
+  text-like → string · number/currency/percent/rating/duration → number · checkbox → `true` (absent = false) · date → `"YYYY-MM-DD"` · datetime → ISO UTC · single_select → `"opt_…"` · multi_select → `["opt_…"]` ·
+  **collaborator → array of raw user uuids** · **attachment → array of raw attachment uuids** · barcode → `{ "text": string }` · json → any JSON ·
+  **link → never in cells** (read `data.record_links`; `a_order` orders the b-records inside an a-record's list, `b_order` the reverse). Legacy link arrays in cells are ignored and stripped on the next write.
+- **Computed storage** (`data.records.computed`, keyed by slot): the **unwrapped** value (number/string/boolean/ISO date string, or an array for lookups — lookup arrays are flattened one level and hold the target field's *stored* values, e.g. raw rec uuids for a lookup of a link field, `opt_` ids for a lookup of a select; serializer hydrates by the target field's type). Formula/compute errors live in `computed["_errors"] = { "<slot>": "#ERROR! message" }` → serializer emits them as `errors: { fld_…: msg }` and omits the value. Old `{value,status}` objects may exist in old rows — treat an object with a `status` key as legacy and unwrap `.value`.
+- Field config is stored with **raw uuids** internally; the wire `FieldDto.config` uses public ids (`tbl_`/`fld_`) and formulas show `{Field Name}`. Use `fieldRowToDto(row, ctx)` from `apps/server/src/modules/schema/field-dto.ts` (B) to serialize fields anywhere (getBase, etc.).
+- Record writes from other modules (import, public form submit, contacts) should use `apps/server/src/modules/records/write.ts` (B): `createRecordsInTx(trx, mctx, {...})` / `updateRecordsInTx` — they run validation, links, compute and counters.

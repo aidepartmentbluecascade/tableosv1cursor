@@ -10,13 +10,29 @@ import type { TabulaDb } from "@tabula/db";
 import type { Env } from "@tabula/config";
 
 const SESSION_TTL_DAYS = 7;
-const IDLE_HOURS = 24;
+
+export interface CreateSessionOptions {
+  authMethod?: "password" | "oauth";
+  mfaLevel?: "none" | "mfa";
+  ip?: string | null;
+  userAgent?: string | null;
+}
+
+function cookieOptions(env: Env) {
+  return {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: env.NODE_ENV === "production",
+  };
+}
 
 export async function createSession(
   db: TabulaDb,
   userId: string,
   reply: FastifyReply,
   env: Env,
+  opts: CreateSessionOptions = {},
 ): Promise<string> {
   const token = generateSessionToken();
   const tokenHash = hashSessionToken(token);
@@ -24,27 +40,51 @@ export async function createSession(
 
   await sql`
     INSERT INTO core.sessions (
-      id, user_id, token_hash, auth_method, idle_expires_at, expires_at
+      id, user_id, token_hash, auth_method, mfa_level, ip, user_agent,
+      idle_expires_at, expires_at
     ) VALUES (
       ${sessionId},
       ${userId},
       ${tokenHash},
-      'password',
+      ${opts.authMethod ?? "password"},
+      ${opts.mfaLevel ?? "none"},
+      ${opts.ip ?? null}::inet,
+      ${opts.userAgent?.slice(0, 500) ?? null},
       now() + interval '24 hours',
       now() + interval '7 days'
     )
   `.execute(db);
 
-  const secure = env.NODE_ENV === "production";
   reply.setCookie(SESSION_COOKIE_NAME, token, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
+    ...cookieOptions(env),
     maxAge: SESSION_TTL_DAYS * 24 * 60 * 60,
   });
 
   return sessionId;
+}
+
+/**
+ * Mint a short-lived, cookie-less session for an automation run. The token is
+ * used by the automation engine to call the public API as the automation owner.
+ */
+export async function createServiceSession(
+  db: TabulaDb,
+  userId: string,
+  ttlMinutes = 15,
+): Promise<{ sessionId: string; token: string }> {
+  const token = generateSessionToken();
+  const sessionId = generateUuidV7();
+  await sql`
+    INSERT INTO core.sessions (
+      id, user_id, token_hash, auth_method, idle_expires_at, expires_at, user_agent
+    ) VALUES (
+      ${sessionId}, ${userId}, ${hashSessionToken(token)}, 'automation',
+      now() + make_interval(mins => ${ttlMinutes}),
+      now() + make_interval(mins => ${ttlMinutes}),
+      'tabula-automation'
+    )
+  `.execute(db);
+  return { sessionId, token };
 }
 
 export async function revokeSession(
@@ -52,16 +92,17 @@ export async function revokeSession(
   sessionId: string,
 ): Promise<void> {
   await sql`
-    UPDATE core.sessions SET revoked_at = now() WHERE id = ${sessionId}
+    UPDATE core.sessions SET revoked_at = now() WHERE id = ${sessionId} AND revoked_at IS NULL
+  `.execute(db);
+}
+
+export async function revokeSessionByToken(db: TabulaDb, token: string): Promise<void> {
+  await sql`
+    UPDATE core.sessions SET revoked_at = now()
+    WHERE token_hash = ${hashSessionToken(token)} AND revoked_at IS NULL
   `.execute(db);
 }
 
 export function clearSessionCookie(reply: FastifyReply, env: Env): void {
-  const secure = env.NODE_ENV === "production";
-  reply.clearCookie(SESSION_COOKIE_NAME, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-  });
+  reply.clearCookie(SESSION_COOKIE_NAME, cookieOptions(env));
 }

@@ -16,6 +16,7 @@ import {
   type QueryFieldRow,
 } from "./context.js";
 import { executeRawQuery } from "./raw-sql.js";
+import { serializeRecords } from "../records/serialize.js";
 
 export interface RecordQueryResult {
   records: Record<string, unknown>[];
@@ -115,7 +116,7 @@ export async function executeRecordQuery(
     : "";
   const limitParam = 1 + fragments.filterParams.length + 1;
   const queryText = `
-    SELECT id, cells, computed, version, row_number, manual_order, created_at
+    SELECT id, cells, computed, version, row_number, manual_order, created_at, updated_at, created_by, updated_by
     FROM data.records r
     WHERE r.table_id = $1 AND r.deleted_at IS NULL
     ${filterClause}
@@ -132,6 +133,9 @@ export async function executeRecordQuery(
     row_number: string;
     manual_order: string;
     created_at: Date;
+    updated_at: Date;
+    created_by: string | null;
+    updated_by: string | null;
   };
 
   const rows = await executeRawQuery<RecordRow>(db, queryText, values);
@@ -149,7 +153,7 @@ export async function executeRecordQuery(
       : null;
 
   return {
-    records: page.map((r) => encodeRecordRow(r, fieldRows)),
+    records: (await serializeRecords(db, tableId, page)) as unknown as Record<string, unknown>[],
     nextCursor,
   };
 }

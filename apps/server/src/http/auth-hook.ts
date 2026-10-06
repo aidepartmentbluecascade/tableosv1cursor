@@ -27,11 +27,13 @@ const PUBLIC_PREFIXES = [
   "/v1/auth/login",
   "/v1/auth/google",
   "/v1/auth/google/callback",
+  "/v1/auth/mfa/verify",
+  "/v1/auth/logout",
 ];
 
 export function isPublicRoute(url: string, method?: string): boolean {
   const path = url.split("?")[0] ?? url;
-  if (path.startsWith("/v1/public/")) {
+  if (path.startsWith("/v1/public/") || path.startsWith("/v1/hooks/")) {
     return true;
   }
   if (method === "PUT" && path.startsWith("/v1/uploads/")) {

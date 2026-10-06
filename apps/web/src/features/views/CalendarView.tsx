@@ -9,11 +9,18 @@ function findDateField(fields: FieldDto[]): FieldDto | undefined {
 export function CalendarView({
   table,
   records,
+  dateFieldId,
+  onOpenRecord,
 }: {
   table: TableDto;
   records: RecordDto[];
+  dateFieldId?: string | null;
+  onOpenRecord?: (recordId: string) => void;
 }) {
-  const dateField = findDateField(table.fields);
+  const dateField =
+    table.fields.find(
+      (f) => f.id === dateFieldId && (f.type === "date" || f.type === "datetime"),
+    ) ?? findDateField(table.fields);
   const primaryId = table.primaryFieldId;
   const primaryField = table.fields.find((f) => f.id === primaryId);
 
@@ -50,7 +57,17 @@ export function CalendarView({
                     primaryField.config,
                   )
                 : record.id;
-              return <li key={record.id}>{title || "Untitled"}</li>;
+              return (
+                <li key={record.id}>
+                  {onOpenRecord ? (
+                    <button type="button" onClick={() => onOpenRecord(record.id)}>
+                      {title || "Untitled"}
+                    </button>
+                  ) : (
+                    title || "Untitled"
+                  )}
+                </li>
+              );
             })}
           </ul>
         </section>

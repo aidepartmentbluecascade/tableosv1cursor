@@ -140,6 +140,24 @@
   cursor: cell;
 }
 
+.wrap[data-row-height="medium"] .td,
+.wrap[data-row-height="medium"] .cellInner {
+  height: 48px;
+  min-height: 48px;
+}
+
+.wrap[data-row-height="tall"] .td,
+.wrap[data-row-height="tall"] .cellInner {
+  height: 64px;
+  min-height: 64px;
+}
+
+.wrap[data-row-height="extra"] .td,
+.wrap[data-row-height="extra"] .cellInner {
+  height: 88px;
+  min-height: 88px;
+}
+
 .rowEven .td,
 .rowEven .rowNum {
   background: #fafbfc;

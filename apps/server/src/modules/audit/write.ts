@@ -5,6 +5,7 @@ export interface AuditEventInput {
   orgId?: string | null;
   workspaceId?: string | null;
   actorUserId?: string | null;
+  actorType?: "user" | "system" | "automation";
   action: string;
   targetType?: string | null;
   targetId?: string | null;
@@ -13,7 +14,25 @@ export interface AuditEventInput {
   userAgent?: string | null;
 }
 
-/** Best-effort audit row insert (no-op if audit schema not migrated). */
+interface AuditLogger {
+  error: (obj: unknown, msg?: string) => void;
+}
+
+let auditLogger: AuditLogger = {
+  error: (obj, msg) => {
+    console.error(msg ?? "audit write failed", obj);
+  },
+};
+
+/** Route audit failures to the app logger (called once at startup). */
+export function setAuditLogger(logger: AuditLogger): void {
+  auditLogger = logger;
+}
+
+/**
+ * Insert an audit row. Audit failures never fail the calling request, but
+ * they are logged (they used to be silently swallowed).
+ */
 export async function writeAuditEvent(
   db: TabulaDb,
   event: AuditEventInput,
@@ -21,21 +40,27 @@ export async function writeAuditEvent(
   try {
     await sql`
       INSERT INTO audit.audit_events (
-        org_id, workspace_id, actor_user_id, action, target_type, target_id,
-        metadata, ip, user_agent
+        org_id, workspace_id, actor_type, actor_id, actor_user_id, action,
+        target_type, target_id, resource_type, resource_id,
+        metadata, meta, ip, user_agent
       ) VALUES (
         ${event.orgId ?? null},
         ${event.workspaceId ?? null},
+        ${event.actorType ?? (event.actorUserId ? "user" : "system")},
+        ${event.actorUserId ?? null},
         ${event.actorUserId ?? null},
         ${event.action},
         ${event.targetType ?? null},
         ${event.targetId ?? null},
+        ${event.targetType ?? null},
+        ${event.targetId ?? null},
+        ${JSON.stringify(event.metadata ?? {})}::jsonb,
         ${JSON.stringify(event.metadata ?? {})}::jsonb,
         ${event.ip ?? null},
         ${event.userAgent ?? null}
       )
     `.execute(db);
-  } catch {
-    // MVP: tolerate missing migration in dev
+  } catch (err) {
+    auditLogger.error({ err, action: event.action }, "audit write failed");
   }
 }

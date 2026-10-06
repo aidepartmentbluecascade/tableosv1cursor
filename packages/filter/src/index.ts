@@ -1,4 +1,6 @@
 export * from "./ast.js";
+export * from "./kinds.js";
+export * from "./dates.js";
 export {
   evaluateFilter,
   andGroup,
