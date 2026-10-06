@@ -211,6 +211,8 @@
   border-bottom: 1px solid var(--tabula-color-border);
   padding: 0;
 }
+
+.canvasWrap {
   flex: 1;
   min-height: 360px;
   position: relative;

@@ -5,6 +5,11 @@ import { defineConfig } from "vite";
 
 const appDir = path.dirname(fileURLToPath(import.meta.url));
 
+// Dev-server ports/targets are overridable so several checkouts can run side by side.
+const apiTarget = process.env["TABULA_API_PROXY"] ?? "http://localhost:3000";
+const realtimeTarget = process.env["TABULA_REALTIME_PROXY"] ?? "ws://localhost:3002";
+const devPort = Number(process.env["TABULA_WEB_PORT"] ?? 5173);
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -20,18 +25,19 @@ export default defineConfig({
     ],
   },
   server: {
-    port: 5173,
+    port: devPort,
+    strictPort: true,
     proxy: {
       "/v1": {
-        target: "http://localhost:3000",
+        target: apiTarget,
         changeOrigin: true,
       },
       "/health": {
-        target: "http://localhost:3000",
+        target: apiTarget,
         changeOrigin: true,
       },
       "/ws": {
-        target: "ws://localhost:3002",
+        target: realtimeTarget,
         ws: true,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ws/, "/v1/ws"),
