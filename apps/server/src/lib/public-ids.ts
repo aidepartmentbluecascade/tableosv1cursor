@@ -1,3 +1,4 @@
+import { PublicIdError } from "../http/errors.js";
 import {
   decodePublicId,
   encodePublicId,
@@ -12,5 +13,10 @@ export function parsePid(
   value: string,
   expectedPrefix: PublicIdPrefix,
 ): string {
-  return decodePublicId(value, expectedPrefix).uuid;
+  try {
+    return decodePublicId(value, expectedPrefix).uuid;
+  } catch {
+    // Surface malformed / wrong-prefix ids as 422 instead of an unhandled 500.
+    throw new PublicIdError(`Invalid ${expectedPrefix} id: ${value}`);
+  }
 }

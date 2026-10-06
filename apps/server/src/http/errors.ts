@@ -102,6 +102,15 @@ export function handleRouteError(
     })));
     return;
   }
+  if (
+    err instanceof Error &&
+    (err.message === "INVALID_FILTER_AST" || err.message === "FILTER_DEPTH_EXCEEDED")
+  ) {
+    validationProblem(request, reply, err.message === "INVALID_FILTER_AST"
+      ? "Invalid filter expression"
+      : "Filter is nested too deeply");
+    return;
+  }
   if (err instanceof PublicIdError) {
     validationProblem(request, reply, err.message);
     return;

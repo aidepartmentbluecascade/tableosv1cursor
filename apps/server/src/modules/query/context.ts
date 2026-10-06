@@ -2,6 +2,7 @@ import { sql } from "kysely";
 import type { TabulaDb } from "@tabula/db";
 import type { PlanQueryContext } from "@tabula/query";
 import { INDEX_SIDECAR_THRESHOLD } from "../recordstore/sidecars.js";
+import { pid } from "../../lib/public-ids.js";
 
 export interface QueryFieldRow {
   id: string;
@@ -48,8 +49,16 @@ export function buildPlanContext(
   fields: QueryFieldRow[],
   meta: TableQueryMeta,
 ): PlanQueryContext {
-  const fieldSlotById = new Map(fields.map((f) => [f.id, f.slot]));
-  const fieldTypeByFieldId = new Map(fields.map((f) => [f.id, f.type]));
+  // Clients address fields by public id (fld_…); internal callers use raw UUIDs.
+  // Register both so filters, sorts and groups resolve either form.
+  const fieldSlotById = new Map<string, number>();
+  const fieldTypeByFieldId = new Map<string, string>();
+  for (const f of fields) {
+    for (const key of [f.id, pid("fld", f.id)]) {
+      fieldSlotById.set(key, f.slot);
+      fieldTypeByFieldId.set(key, f.type);
+    }
+  }
   const sidecarReadySlots = new Set<number>();
   for (const f of fields) {
     if (f.index_state === "ready") {

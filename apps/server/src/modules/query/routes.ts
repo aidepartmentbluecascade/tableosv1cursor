@@ -13,7 +13,7 @@ const queryBody = z.object({
     .array(z.object({ field: z.string(), direction: z.enum(["asc", "desc"]) }))
     .optional(),
   pageSize: z.number().int().min(1).max(500).optional(),
-  cursor: z.string().optional(),
+  cursor: z.string().nullish(),
   fields: z.array(z.string()).optional(),
 });
 
@@ -64,7 +64,7 @@ export async function registerQueryRoutes(
         };
         if (body.filter !== undefined) queryInput.filter = body.filter;
         if (sort !== undefined) queryInput.sort = sort;
-        if (body.cursor !== undefined) queryInput.cursor = body.cursor;
+        if (body.cursor) queryInput.cursor = body.cursor;
 
         const result = await executeRecordQuery(ctx.db, tableId, queryInput);
 
